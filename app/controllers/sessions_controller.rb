@@ -1,34 +1,29 @@
-class UsersController < ApplicationController
+class SessionsController < ApplicationController
   # get
-  def signup
-    # render a view and let a user register
-    # my only job... is to render a form! yay! i have a job :)
+  def login
+    # form to login
 
   end
 
   # post
   def confirmation
-    # puts '-----users#confirmation-------'
-    # puts user_params
-    # puts '-----end users#confirmation-------'
-    # post request that handles registration/says thanks
+    # show a user message regarding login status
+    @user = User.find_by_email(params[:email])
 
-    @user = User.new(user_params)
-    if @user.save
-      # thanks! you're in!
-      session[:user_id] = @user.id
+    if @user && @user.authenticate(params[:password])
+        session[:user_id] = @user.id
+        redirect_to '/'
     else
-      # womp womp.. error msg
-      @message = 'User account exists or passwords do not match.'
-      render 'users/signup'
+      @message = 'User account or invalid password'
+        render '/sessions/login'
     end
 
   end
 
-private
-
-  def user_params
-    params.require(:user).permit(:username, :email, :password, :password_confirmation)
+  # get
+  def logout
+    # logout
+    session[:user_id] = nil
+    redirect_to '/users/login'
   end
-
 end
